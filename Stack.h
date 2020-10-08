@@ -28,13 +28,15 @@ public:
     Stack();
     Stack(const Stack&);
 
-    bool isFull();
-    bool isEmpty();
+    bool isFull() const;
+    bool isEmpty() const;
 
-    void push();
+    void push(const T&);
     T pop();
-    T getTop();
-    int getSize();
+    T getTop() const;
+    int getSize() const;
+
+    Stack &operator=(const Stack &);
 private:
     T data[MAXSIZE];
     int top;
@@ -50,35 +52,47 @@ Stack<T, MAXSIZE>::Stack(const Stack &cpy):top(cpy.top) {
 }
 
 template<typename T, int MAXSIZE>
-bool Stack<T, MAXSIZE>::isFull() {
+bool Stack<T, MAXSIZE>::isFull() const{
     return top == MAXSIZE-1;
 }
 
 template<typename T, int MAXSIZE>
-bool Stack<T, MAXSIZE>::isEmpty() {
+bool Stack<T, MAXSIZE>::isEmpty() const{
     return top==-1;
 }
 
 template<typename T, int MAXSIZE>
-void Stack<T, MAXSIZE>::push() {
-
+void Stack<T, MAXSIZE>::push(const T& obj) {
+    if(isFull())
+        throw StackException("Stack overflow");
+    top++;
+    data[top] = obj;
 }
 
 template<typename T, int MAXSIZE>
 T Stack<T, MAXSIZE>::pop() {
-    return nullptr;
+    if(isEmpty())
+        throw StackException("Empty stack");
+    top--;
+    return data[top + 1];
 }
 
 template<typename T, int MAXSIZE>
-T Stack<T, MAXSIZE>::getTop() {
+T Stack<T, MAXSIZE>::getTop() const {
     if(isEmpty())
         throw StackException("Empty Stack");
     return data[top];
 }
 
 template<typename T, int MAXSIZE>
-int Stack<T, MAXSIZE>::getSize() {
+int Stack<T, MAXSIZE>::getSize() const {
     return top+1;
+}
+
+template<typename T, int MAXSIZE>
+Stack<T, MAXSIZE>& Stack<T, MAXSIZE>::operator=(const Stack &obj){
+    this = Stack(obj);
+    return *this;
 }
 
 
