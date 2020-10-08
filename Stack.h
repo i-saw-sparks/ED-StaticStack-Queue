@@ -47,8 +47,11 @@ Stack<T, MAXSIZE>::Stack():top(-1) {}
 
 template<typename T, int MAXSIZE>
 Stack<T, MAXSIZE>::Stack(const Stack<T, MAXSIZE> &cpy):top(cpy.top) {
-    for(int i = 0; i < MAXSIZE; i++)
-        data[i] = cpy.data[i];
+    if (!cpy.isEmpty()) {
+        for (int i = 0; i <= cpy.top; i++)
+            data[i] = cpy.data[i];
+
+    }
 }
 
 template<typename T, int MAXSIZE>

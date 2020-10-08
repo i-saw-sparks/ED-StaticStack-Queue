@@ -36,8 +36,30 @@ public:
 
     Queue &operator=(const Queue<T, MAXSIZE>&);
 private:
+    T data[MAXSIZE];
+    int lastPos;
 };
 
+template<typename T, int MAXSIZE>
+Queue<T, MAXSIZE>::Queue():lastPos(-1) {}
+
+template<typename T, int MAXSIZE>
+Queue<T, MAXSIZE>::Queue(const Queue<T,MAXSIZE>& cpy):lastPos(cpy.lastPos) {
+    if(!cpy.isEmpty()) {
+        for (int i = 0; i <= cpy.lastPos; i++)
+            data[i] = cpy.data[i];
+    }
+}
+
+template<typename T, int MAXSIZE>
+bool Queue<T, MAXSIZE>::isEmpty() const {
+    return lastPos == -1;
+}
+
+template<typename T, int MAXSIZE>
+bool Queue<T, MAXSIZE>::isFull() const {
+    return lastPos == MAXSIZE-1;
+}
 
 
 #endif //PILACOLAESTATICA_QUEUE_H
