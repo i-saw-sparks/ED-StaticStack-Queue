@@ -61,5 +61,39 @@ bool Queue<T, MAXSIZE>::isFull() const {
     return lastPos == MAXSIZE-1;
 }
 
+template<typename T, int MAXSIZE>
+void Queue<T, MAXSIZE>::enqueue(const T &obj) {
+    if(isFull())
+        throw QueueException("Queue is full");
+    lastPos++;
+    data[lastPos] = obj;
+}
+
+template<typename T, int MAXSIZE>
+void Queue<T, MAXSIZE>::dequeue() {
+    if(isEmpty())
+        throw QueueException("Queue is empty");
+
+    for (int i = 0; i < lastPos; ++i) {
+        data[i] = data[i+1];
+    }
+
+    lastPos--;
+}
+
+template<typename T, int MAXSIZE>
+T Queue<T, MAXSIZE>::getFront() const {
+    if(isEmpty())
+        throw QueueException("Queue is empty");
+
+    return data[0];
+}
+
+template<typename T, int MAXSIZE>
+Queue<T, MAXSIZE> &Queue<T, MAXSIZE>::operator=(const Queue<T,MAXSIZE>& cpy) {
+    this = Queue(cpy);
+    return *this;
+}
+
 
 #endif //PILACOLAESTATICA_QUEUE_H
