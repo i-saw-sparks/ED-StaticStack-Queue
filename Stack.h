@@ -26,7 +26,7 @@ template <typename T, int MAXSIZE = 2048>
 class Stack {
 public:
     Stack();
-    Stack(const Stack&);
+    Stack(const Stack<T, MAXSIZE>&);
 
     bool isFull() const;
     bool isEmpty() const;
@@ -36,7 +36,7 @@ public:
     T getTop() const;
     int getSize() const;
 
-    Stack &operator=(const Stack &);
+    Stack &operator=(const Stack<T, MAXSIZE> &);
 private:
     T data[MAXSIZE];
     int top;
@@ -46,7 +46,7 @@ template<typename T, int MAXSIZE>
 Stack<T, MAXSIZE>::Stack():top(-1) {}
 
 template<typename T, int MAXSIZE>
-Stack<T, MAXSIZE>::Stack(const Stack &cpy):top(cpy.top) {
+Stack<T, MAXSIZE>::Stack(const Stack<T, MAXSIZE> &cpy):top(cpy.top) {
     for(int i = 0; i < MAXSIZE; i++)
         data[i] = cpy.data[i];
 }
@@ -90,7 +90,7 @@ int Stack<T, MAXSIZE>::getSize() const {
 }
 
 template<typename T, int MAXSIZE>
-Stack<T, MAXSIZE>& Stack<T, MAXSIZE>::operator=(const Stack &obj){
+Stack<T, MAXSIZE>& Stack<T, MAXSIZE>::operator=(const Stack<T, MAXSIZE> &obj){
     this = Stack(obj);
     return *this;
 }

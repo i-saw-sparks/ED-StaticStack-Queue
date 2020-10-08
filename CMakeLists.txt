@@ -3,4 +3,4 @@ project(PilaColaEstatica)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(PilaColaEstatica main.cpp Stack.h)
+add_executable(PilaColaEstatica main.cpp Stack.h Queue.h)
