@@ -15,7 +15,7 @@ public:
     static void printAsPostfix(const Queue<char>&, std::ostream&);
     static Queue<char> infixToPostfix(const Queue<char>&);
 
-//private:
+private:
     static bool isGreaterOrEqual(char, char);
 };
 
