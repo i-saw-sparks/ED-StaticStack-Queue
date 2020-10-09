@@ -33,6 +33,7 @@ public:
     void enqueue(const T&);
     void dequeue();
     T getFront() const;
+    int getSize() const;
 
     Queue &operator=(const Queue<T, MAXSIZE>&);
 private:
@@ -46,7 +47,7 @@ Queue<T, MAXSIZE>::Queue():lastPos(-1) {}
 template<typename T, int MAXSIZE>
 Queue<T, MAXSIZE>::Queue(const Queue<T,MAXSIZE>& cpy):lastPos(cpy.lastPos) {
     if(!cpy.isEmpty()) {
-        for (int i = 0; i <= cpy.lastPos; i++)
+        for (int i = 0; i < cpy.getSize(); i++)
             data[i] = cpy.data[i];
     }
 }
@@ -93,6 +94,11 @@ template<typename T, int MAXSIZE>
 Queue<T, MAXSIZE> &Queue<T, MAXSIZE>::operator=(const Queue<T,MAXSIZE>& cpy) {
     this = Queue(cpy);
     return *this;
+}
+
+template<typename T, int MAXSIZE>
+int Queue<T, MAXSIZE>::getSize() const {
+    return lastPos + 1;
 }
 
 

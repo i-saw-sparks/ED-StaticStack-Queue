@@ -13,7 +13,10 @@
 class PostfixExp {
 public:
     static void printAsPostfix(const Queue<char>&, std::ostream&);
-    static Queue<char>& infixToPostfix(const Queue<char>&);
+    static Queue<char> infixToPostfix(const Queue<char>&);
+
+//private:
+    static bool isGreaterOrEqual(char, char);
 };
 
 
