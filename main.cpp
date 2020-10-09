@@ -27,6 +27,6 @@ Queue<char> ex;
     ex.enqueue('G');
     ex.enqueue('*');
     ex.enqueue('H');
-    PostfixExp::infixToPostfix(ex);
+    PostfixExp::printAsPostfix(ex, std::cout);
     return 0;
 }

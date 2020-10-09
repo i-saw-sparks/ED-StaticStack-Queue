@@ -17,12 +17,11 @@ Queue<char> PostfixExp::infixToPostfix(const Queue<char> &obj) {
             else if (inf.getFront() == ')') {
                 while (workingStack.getTop() != '(') {
                     post.enqueue(workingStack.pop());
-                    if(workingStack.isEmpty())
+                    if (workingStack.isEmpty())
                         break;
                 }
                 workingStack.pop();
-            }
-            else if (workingStack.isEmpty())
+            } else if (workingStack.isEmpty())
                 workingStack.push(inf.getFront());
             else if (inf.getFront() == '+' || inf.getFront() == '-') {
                 while (isGreaterOrEqual(workingStack.getTop(), '+') && workingStack.getTop() != '(') {
@@ -31,14 +30,14 @@ Queue<char> PostfixExp::infixToPostfix(const Queue<char> &obj) {
                         break;
                 }
                 workingStack.push(inf.getFront());
-            }else if (inf.getFront() == '/' || inf.getFront() == '*') {
+            } else if (inf.getFront() == '/' || inf.getFront() == '*') {
                 while (isGreaterOrEqual(workingStack.getTop(), '*') && workingStack.getTop() != '(') {
                     post.enqueue(workingStack.pop());
                     if (workingStack.isEmpty())
                         break;
                 }
                 workingStack.push(inf.getFront());
-            }else if (inf.getFront() == '^') {
+            } else if (inf.getFront() == '^') {
                 while (isGreaterOrEqual(workingStack.getTop(), '^') && workingStack.getTop() != '(') {
                     post.enqueue(workingStack.pop());
                     if (workingStack.isEmpty())
@@ -57,6 +56,12 @@ Queue<char> PostfixExp::infixToPostfix(const Queue<char> &obj) {
 }
 
 void PostfixExp::printAsPostfix(const Queue<char> &inf, std::ostream &os) {
+    Queue<char> toPrint = infixToPostfix(inf);
+
+    while(!toPrint.isEmpty()){
+        os<<toPrint.getFront();
+        toPrint.dequeue();
+    }
 
 }
 
