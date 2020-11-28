@@ -22,80 +22,153 @@ public:
     }
 };
 
-template <typename T, int MAXSIZE = 2048>
+template <typename T>
 class Stack {
+private:
+    class Node{
+    private:
+        T data;
+        Node* next;
+    public:
+        Node();
+        Node(const T&);
+
+        T getData() const;
+        Node* getNext() const;
+
+        void setData(const T&);
+        void setNext(Node*);
+    };
+
+    Node* anchor;
+    void deleteAll();
+
 public:
     Stack();
-    Stack(const Stack<T, MAXSIZE>&);
+    Stack(const Stack&);
+    ~Stack();
 
-    bool isFull() const;
     bool isEmpty() const;
 
     void push(const T&);
     T pop();
     T getTop() const;
-    int getSize() const;
-
-    Stack &operator=(const Stack<T, MAXSIZE> &);
-private:
-    T data[MAXSIZE];
-    int top;
+    Stack& operator = (const Stack&);
 };
 
-template<typename T, int MAXSIZE>
-Stack<T, MAXSIZE>::Stack():top(-1) {}
+template<typename T>
+void Stack<T>::deleteAll() {
+    Node* aux;
 
-template<typename T, int MAXSIZE>
-Stack<T, MAXSIZE>::Stack(const Stack<T, MAXSIZE> &cpy):top(cpy.top) {
-    if (!cpy.isEmpty()) {
-        for (int i = 0; i <= cpy.top; i++)
-            data[i] = cpy.data[i];
+    while (anchor != nullptr){
+        aux = anchor;
+        anchor = anchor ->getNext();
 
+        delete aux;
     }
 }
 
-template<typename T, int MAXSIZE>
-bool Stack<T, MAXSIZE>::isFull() const{
-    return top == MAXSIZE-1;
+template<typename T>
+Stack<T>::Stack():anchor(nullptr) {}
+
+template<typename T>
+Stack<T>::Stack(const Stack &arg):anchor(nullptr) {
+    Node* aux(arg.anchor);
+    Node* last(nullptr);
+    Node* newNode;
+
+    while(aux != nullptr){
+        newNode = new Node(aux->getData());
+        if(newNode == nullptr)
+            throw StackException("Stack(): bad_alloc");
+
+        if(last == nullptr)
+            anchor = newNode;
+        else
+            last->setNext(newNode);
+
+        last = newNode;
+        aux= aux->getNext();
+    }
 }
 
-template<typename T, int MAXSIZE>
-bool Stack<T, MAXSIZE>::isEmpty() const{
-    return top==-1;
+template<typename T>
+Stack<T>::~Stack() {
+    deleteAll();
 }
 
-template<typename T, int MAXSIZE>
-void Stack<T, MAXSIZE>::push(const T& obj) {
-    if(isFull())
-        throw StackException("Stack overflow");
-    top++;
-    data[top] = obj;
+template<typename T>
+bool Stack<T>::isEmpty() const {
+    return anchor == nullptr;
 }
 
-template<typename T, int MAXSIZE>
-T Stack<T, MAXSIZE>::pop() {
-    if(isEmpty())
-        throw StackException("Empty stack");
-    top--;
-    return data[top + 1];
-}
+template<typename T>
+Stack<T>& Stack<T>::operator=(const Stack &arg) {
+    deleteAll();
+    this = Stack(arg);
 
-template<typename T, int MAXSIZE>
-T Stack<T, MAXSIZE>::getTop() const {
-    if(isEmpty())
-        throw StackException("Empty Stack");
-    return data[top];
-}
-
-template<typename T, int MAXSIZE>
-int Stack<T, MAXSIZE>::getSize() const {
-    return top+1;
-}
-
-template<typename T, int MAXSIZE>
-Stack<T, MAXSIZE>& Stack<T, MAXSIZE>::operator=(const Stack<T, MAXSIZE> &obj){
-    this = Stack(obj);
     return *this;
+}
+
+template<typename T>
+void Stack<T>::push(const T &arg) {
+    Node* aux(new Node(arg));
+
+    if(aux == nullptr){
+        throw StackException("push(const T&): std::bad_alloc");
+    }
+
+    aux->setNext(anchor);
+    anchor = aux;
+}
+
+template<typename T>
+T Stack<T>::pop() {
+    if(anchor == nullptr){
+        throw StackException("pop(): Stack is empty");
+    }
+
+    T res(anchor->getData());
+    Node* aux(anchor);
+    anchor = anchor -> getNext();
+
+    delete aux;
+    return res;
+}
+
+template<typename T>
+T Stack<T>::getTop() const {
+    if(anchor == nullptr){
+        throw StackException("getTop(): std::bad_alloc");
+    }
+
+    return anchor -> getData();
+}
+
+template<typename T>
+Stack<T>::Node::Node():next(nullptr) {}
+
+template<typename T>
+Stack<T>::Node::Node(const T &arg):data(arg), next(nullptr) {}
+
+template<typename T>
+T Stack<T>::Node::getData() const {
+    return data;
+}
+
+template<typename T>
+typename Stack<T>::Node* Stack<T>::Node::getNext() const {
+    return next;
+}
+
+template<typename T>
+void Stack<T>::Node::setData(const T &arg) {
+    data = arg;
+}
+
+template<typename T>
+void Stack<T>::Node::setNext(Stack::Node *arg) {
+    next = arg;
 }
 
 

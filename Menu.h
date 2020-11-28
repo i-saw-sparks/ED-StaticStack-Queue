@@ -16,7 +16,6 @@
 class Menu {
 public:
     static void run(std::ostream&, std::istream&);
-
 };
 
 

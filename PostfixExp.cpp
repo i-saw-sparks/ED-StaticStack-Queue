@@ -20,7 +20,8 @@ Queue<char> PostfixExp::infixToPostfix(const Queue<char> &obj) {
                     if (workingStack.isEmpty())
                         break;
                 }
-                workingStack.pop();
+                if(!workingStack.isEmpty())
+                    workingStack.pop();
             } else if (workingStack.isEmpty())
                 workingStack.push(inf.getFront());
             else if (inf.getFront() == '+' || inf.getFront() == '-') {
