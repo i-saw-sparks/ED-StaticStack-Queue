@@ -8,97 +8,228 @@
 #include <exception>
 #include <string>
 
-class QueueException : std::exception{
+class Exception : std::exception {
 private:
     std::string msg;
 public:
-    explicit QueueException(const char* msg): msg(msg){}
-    explicit QueueException(const std::string& msg): msg(msg){}
+    explicit Exception(const char *msg) : msg(msg) {}
 
-    virtual ~QueueException() throw(){}
+    explicit Exception(const std::string &msg) : msg(msg) {}
 
-    const char* what() const throw() override{
+    virtual ~Exception() throw() {}
+
+    const char *what() const throw() override {
         return msg.c_str();
     }
 };
 
-template <typename T, int MAXSIZE = 2048>
+template<typename T>
 class Queue {
+private:
+    class Node {
+    private:
+        T *data;
+        Node *next;
+        Node *prev;
+    public:
+        Node();
+        Node(const T &);
+        ~Node();
+
+        T *getDataPtr() const;
+        T getData() const;
+        Node *getNext() const;
+        Node *getPrev() const;
+
+        void setDataPtr(T *);
+        void setData(const T &);
+        void setNext(Node *);
+        void setPrev(Node *);
+    };
+
+    Node *header;
+    void deleteAll();
+
 public:
     Queue();
-    Queue(const Queue<T, MAXSIZE>&);
+    Queue(const Queue &);
+    ~Queue();
 
     bool isEmpty() const;
-    bool isFull() const;
-    void enqueue(const T&);
-    void dequeue();
-    T getFront() const;
-    int getSize() const;
 
-    Queue &operator=(const Queue<T, MAXSIZE>&);
-private:
-    T data[MAXSIZE];
-    int lastPos;
+    void enqueue(const T &);
+    T dequeue();
+
+    T getFront() const;
+
+    Queue &operator=(const Queue &);
 };
 
-template<typename T, int MAXSIZE>
-Queue<T, MAXSIZE>::Queue():lastPos(-1) {}
-
-template<typename T, int MAXSIZE>
-Queue<T, MAXSIZE>::Queue(const Queue<T,MAXSIZE>& cpy):lastPos(cpy.lastPos) {
-    if(!cpy.isEmpty()) {
-        for (int i = 0; i < cpy.getSize(); i++)
-            data[i] = cpy.data[i];
-    }
-}
-
-template<typename T, int MAXSIZE>
-bool Queue<T, MAXSIZE>::isEmpty() const {
-    return lastPos == -1;
-}
-
-template<typename T, int MAXSIZE>
-bool Queue<T, MAXSIZE>::isFull() const {
-    return lastPos == MAXSIZE-1;
-}
-
-template<typename T, int MAXSIZE>
-void Queue<T, MAXSIZE>::enqueue(const T &obj) {
-    if(isFull())
-        throw QueueException("Queue is full");
-    lastPos++;
-    data[lastPos] = obj;
-}
-
-template<typename T, int MAXSIZE>
-void Queue<T, MAXSIZE>::dequeue() {
-    if(isEmpty())
-        throw QueueException("Queue is empty");
-
-    for (int i = 0; i < lastPos; ++i) {
-        data[i] = data[i+1];
+template<typename T>
+Queue<T>::Queue():header(new Node) {
+    if (header == nullptr) {
+        throw Exception("Queue(): std::bad_alloc");
     }
 
-    lastPos--;
+    header->setNext(header);
+    header->setPrev(header);
 }
 
-template<typename T, int MAXSIZE>
-T Queue<T, MAXSIZE>::getFront() const {
-    if(isEmpty())
-        throw QueueException("Queue is empty");
-
-    return data[0];
+template<typename T>
+Queue<T>::~Queue() {
+    deleteAll();
+    delete header;
 }
 
-template<typename T, int MAXSIZE>
-Queue<T, MAXSIZE> &Queue<T, MAXSIZE>::operator=(const Queue<T,MAXSIZE>& cpy) {
-    this = Queue(cpy);
+template<typename T>
+bool Queue<T>::isEmpty() const{
+    return header->getNext() == header;
+}
+
+template<typename T>
+void Queue<T>::enqueue(const T &arg) {
+    Node *aux;
+
+    if ((aux = new Node(arg)) == nullptr) {
+        throw Exception("Node(): std::bad_alloc");
+    }
+
+    aux->setPrev(header->getPrev());
+    aux->setNext(header);
+
+    header->getPrev()->setNext(aux);
+    header->setPrev(aux);
+}
+
+template<typename T>
+T Queue<T>::dequeue() {
+    if(isEmpty()){
+        throw Exception("dequeue(): Queue is empty");
+    }
+
+    T res(header->getNext()->getData());
+    Node* aux(header->getNext());
+
+    aux->getPrev()->setNext(aux->getNext());
+    aux->getNext()->setPrev(aux->getPrev());
+
+    delete aux;
+    return res;
+}
+
+template<typename T>
+T Queue<T>::getFront() const {
+    if(isEmpty()){
+        throw Exception("getFront(): queue is empty");
+    }
+
+    return header->getNext()->getData();
+}
+
+template<typename T>
+Queue<T>& Queue<T>::operator=(const Queue &arg) {
+    deleteAll();
+
+    this = Queue(arg);
     return *this;
 }
 
-template<typename T, int MAXSIZE>
-int Queue<T, MAXSIZE>::getSize() const {
-    return lastPos + 1;
+template<typename T>
+Queue<T>::Queue(const Queue &arg) :Queue(){
+    Node* aux(arg.header->getNext());
+    Node* newNode;
+
+    while(aux != arg.header) {
+        if ((newNode = new Node(aux->getData())) == nullptr) {
+            throw Exception("Queue(): std::bad_alloc");
+        }
+
+
+        newNode->setPrev(header->getPrev());
+        newNode->setNext(header);
+
+        header->getPrev()->setNext(newNode);
+        header->setPrev(newNode);
+
+        aux = aux->getNext();
+    }
+}
+
+template<typename T>
+void Queue<T>::deleteAll() {
+    Node* aux;
+
+    while(header->getNext() != header){
+        aux = header->getNext();
+        header->setNext(aux->getNext());
+        delete aux;
+    }
+
+    header->setPrev(header);
+}
+
+template<typename T>
+Queue<T>::Node::Node(): data(nullptr), prev(nullptr), next(nullptr) {}
+
+template<typename T>
+Queue<T>::Node::~Node() {
+    delete data;
+}
+
+template<typename T>
+Queue<T>::Node::Node(const T &arg): data(new T(arg)), prev(nullptr), next(nullptr) {
+    if (data == nullptr) {
+        throw Exception("Node(): std::bad_alloc");
+    }
+}
+
+template<typename T>
+T *Queue<T>::Node::getDataPtr() const {
+    return data;
+}
+
+template<typename T>
+T Queue<T>::Node::getData() const {
+    if (data == nullptr) {
+        throw Exception("Node::getData(): nullptr");
+    }
+    return *data;
+}
+
+template<typename T>
+typename Queue<T>::Node *Queue<T>::Node::getNext() const {
+    return next;
+}
+
+template<typename T>
+typename Queue<T>::Node *Queue<T>::Node::getPrev() const {
+    return prev;
+}
+
+template<typename T>
+void Queue<T>::Node::setDataPtr(T *arg) {
+    data = arg;
+}
+
+template<typename T>
+void Queue<T>::Node::setData(const T &arg) {
+    if (data == nullptr) {
+        if ((data = new T(arg)) == nullptr) {
+            throw Exception("Node::setData(): std::bad_alloc");
+        }
+    } else {
+        *data = arg;
+    }
+}
+
+template<typename T>
+void Queue<T>::Node::setNext(Queue::Node *arg) {
+    next = arg;
+}
+
+template<typename T>
+void Queue<T>::Node::setPrev(Queue::Node *arg) {
+    prev = arg;
 }
 
 
